@@ -1,5 +1,4 @@
-<div style="text-align: center;">
-<textarea rows=8 cols=22 readonly style="resize: none;">
+```text
     _______   ______  
    |       \ |      \ 
    | ▓▓▓▓▓▓▓\ \▓▓▓▓▓▓\
@@ -7,8 +6,7 @@
    | ▓▓  | ▓▓  ▓▓▓▓▓▓▓
    | ▓▓  | ▓▓\▓▓    ▓▓
     \▓▓   \▓▓ \▓▓▓▓▓▓▓
-</textarea>
-</div>
+```
 
 **na** (aka: _nested-aliases_, _non-aliases_, _not-[an]-alias_) is a CLI tool to effortlessly manage context aware personalized shortcuts for shell commands.
 
