@@ -1,56 +1,40 @@
 package cmd
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"os"
-	"slices"
 	"strings"
 
+	"github.com/moyiz/na/internal/config"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-func validRemoveArgs(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	viper.SetConfigFile(CurrentConfigFile())
-	viper.ReadInConfig()
-	currentKey := strings.Join(args, ".")
-	commands := make([]string, 0)
-	containsDoubleDash := slices.Contains(os.Args, "--")
-	for _, k := range viper.AllKeys() {
-		if strings.HasPrefix(k, currentKey) {
-			trail, _ := strings.CutPrefix(k, currentKey)
-			if suggestion := strings.Split(strings.TrimLeft(trail, "."), ".")[0]; suggestion != "" && !containsDoubleDash {
-				commands = append(commands, suggestion)
-			}
+var removeCmd = &cobra.Command{
+	Use:               "remove [name ...]",
+	Short:             "Removes a nested alias from configuration",
+	Aliases:           []string{"rm"},
+	Args:              cobra.MinimumNArgs(1),
+	ValidArgsFunction: validRemoveArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		c := config.GetFromFiles(CurrentConfigFile())
+		if err := c.UnsetAlias(args...); err != nil {
+			fmt.Println("na:", strings.Join(args, " ")+":", err)
+			os.Exit(1)
 		}
-	}
-	if currentKey != "" && len(commands) == 0 && containsDoubleDash {
-		// ToDo: Add completions of the actual command here.
-		return commands, cobra.ShellCompDirectiveDefault
-	}
-	return commands, cobra.ShellCompDirectiveNoFileComp
+	},
 }
 
-func removeRun(cmd *cobra.Command, args []string) {
-	viper.SetConfigFile(CurrentConfigFile())
-	viper.ReadInConfig()
-
-	settings := viper.AllSettings()
-	numArgs := len(args)
-	configPart := settings
-	for _, part := range args[:numArgs-1] {
-		configPart = configPart[part].(map[string]interface{})
+func validRemoveArgs(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	c := config.GetFromFiles(CurrentConfigFile())
+	currentPrefix := strings.Join(args, " ")
+	suggestions := make([]string, 0)
+	for _, a := range c.ListAliases(args...) {
+		trail, _ := strings.CutPrefix(a.Name, currentPrefix)
+		if trailFields := strings.Fields(trail); len(trailFields) > 0 {
+			suggestions = append(suggestions, trailFields[0])
+		} else {
+			break
+		}
 	}
-	if _, ok := configPart[args[numArgs-1]]; !ok {
-		fmt.Println("na:", strings.Join(args, " ")+": not found")
-		return
-	}
-
-	delete(configPart, args[numArgs-1])
-	encodedConfig, _ := json.MarshalIndent(settings, "", " ")
-	viper.ReadConfig(bytes.NewReader(encodedConfig))
-
-	viper.WriteConfig()
+	return suggestions, cobra.ShellCompDirectiveNoFileComp
 }
