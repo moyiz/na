@@ -15,7 +15,7 @@ func listRun(cmd *cobra.Command, args []string) {
 	prefix := strings.Join(args, ".")
 	for _, k := range keys {
 		if strings.HasPrefix(k, prefix) {
-			fmt.Println("na add", strings.ReplaceAll(k, ".", " "), "--", viper.GetString(k))
+			fmt.Println(strings.ReplaceAll(k, ".", " "), "--", viper.GetString(k))
 		}
 	}
 }
