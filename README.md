@@ -7,8 +7,13 @@
    | ▓▓  | ▓▓\▓▓    ▓▓
     \▓▓   \▓▓ \▓▓▓▓▓▓▓
 ```
+![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/moyiz/na)
+[![Go Reference](https://pkg.go.dev/badge/github.com/moyiz/na.svg)](https://pkg.go.dev/github.com/moyiz/na)
+![GitHub License](https://img.shields.io/github/license/moyiz/na)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/moyiz/na)
 
-**na** (aka: _nested-aliases_, _non-aliases_, _not-[an]-alias_) is a CLI tool to effortlessly manage context aware personalized shortcuts for shell commands.
+
+**na** (aka: _nested-aliases_, _non-aliases_, _not-[an]-alias_) is a CLI tool to effortlessly manage context aware nested shortcuts for shell commands.
 
 <!-- Demo here -->
 
@@ -16,8 +21,11 @@
 - [Motivation](#motivation)
 - [Features](#features)
 - [Installation](#installation)
+    - [Binaries](#binaries)
     - [Source](#source)
-- [Getting Started](#getting-started)
+    - [AUR](#aur)
+    - [Build](#build)
+- [Usage](#usage)
     - [Adding shortcuts](#adding-shortcuts)
     - [Listing shortcuts](#listing-shortcuts)
     - [Running shortcuts](#running-shortcuts)
@@ -28,8 +36,7 @@
     - [Fish](#fish)
     - [Powershell](#powershell)
 - [Configuration](#configuration)
-    - [Locations](#locations)
-    - [Loading](#loading)
+    - [Showcase](#showcase)
     - [Example](#example)
 - [Known Issues](#known-issues)
 - [Future Plans](#future-plans)
@@ -40,39 +47,57 @@ Shell aliases are fun. They provide an easy and straightforward way to create si
 - *Aliases must be named with a single word* - It makes grouping related aliases within the same context a bit awkward, e.g:
     ```sh
     alias lab-password-sftpgo="k get secret -n sftpgo sftpgo-admin -ojsonpath='{.data.admin-password}' | base64 -d"
-    alias lab-password-gitea="k get secret -n gitea  gitea-secret -ojsonpath='{.data.password}' | base64 -d"
+    alias lab-password-gitea="k get secret -n gitea gitea-secret -ojsonpath='{.data.password}' | base64 -d"
     alias lab-create-secret="k create secret --dry-run -oyaml"
     ```
     Using dashes (or underscores) to separate conceptual subcommands interferes with the flow of shell completion and renaming the common prefixes of the aliases names is inconvenient as well. This limitation also prevent aliases from imitating commands.
 - Without implementing workarounds, *Aliases (or any shell configuration) are global for the current user*, and thus there is *no context aware toggling of aliases* - Some of the aliases might be relevant only for a single purpose or project.
-- *Sharing aliases with others is not fun from a maintenance perspective* - You can always `alias > export.aliases` and share it, but some of the aliases will most likely have to be manually filtered.
-- *Aliases are substituted and do not support passing non suffixed arguments* - Aliases are substituted. That is why there is no support for passing arguments that are not suffixed to the alias itself. A possible workaround is to use shell functions or other tools (See [Future Plans](#future-plans)).
+- *Aliases do not support passing non suffixed arguments* - Aliases are substituted. That is why there is no support for passing arguments that are not suffixed to the alias itself. A possible workaround is to use shell functions or other tools (See [Future Plans](#future-plans)).
 
 Last but not least, this project is a great excuse for me to work with _Go_, as it is a great language for developing CLI tools. Single binaries for CLI tools are awesome.
 
 ## Features
-- Nesting aliases (ehm, shortcuts).
+- **N**esting **a**liases (ehm, shortcuts).
 - Dynamic shell completions.
-- Layered configuration (local and home config).
 - Simple and readable configuration.
+- Layered configuration (local and home config).
 
 ## Installation
 
+### Binaries
+Available in [Releases](https://github.com/moyiz/na/releases) page.
+
 ### Source
 ```sh
-go install github.com/moyiz/na
+go install github.com/moyiz/na@latest
 ```
 
-## Getting Started
+### AUR
+Use your favorite AUR helper:
+```sh
+yay -S na-bin
+```
+
+### Build
+```sh
+git clone https://github.com/moyiz/na.git
+go build .
+# And move it to your preferred `bin`
+mv na ~/.local/bin
+```
+
+## Usage
 
 ### Adding shortcuts
-Use the `add` subcommand (or its shorter form: `a`).
+Use the `add` subcommand (or its shorter form: `a`) to add new shortcuts:
 ```sh
 na add my shortcut cwd pwd
 na a my longcut cwd -- echo A shortcut to show current working directory, which is '$PWD'
 na a e echo
 ```
-In the first example (without double dashes), the last argument is tha target of the shortcut, i.e running `na run my shortcut cwd` will run `pwd`. This is handy for single word targets. Multi word targets can be quoted, but using a double dash is also a valid option. In the second example, anything after the double dash is considered target, thus `na run my longcut cwd` will run that long `echo`. Notice that `$PWD` is single quoted. This is to ensure the actual substitution will occur when the shortcut is called, rather than when it is being added.
+In the first example (without double dashes), the last argument is the target of the shortcut, i.e `na run my shortcut cwd` will execute `pwd`. This is handy for single word commands.
+
+Multi word commands can be quoted (i.e `na add my shortcut "ls -ltra"`) but using a double dash is also a valid option. In the second example, anything after the double dash is considered target, thus `na run my longcut cwd` will run that long `echo`. Notice that `$PWD` is single quoted. This is to ensure the actual substitution will occur when the shortcut is called, rather than when it is being added.
 
 If the config directory does not exist, `na` will create it.
 
@@ -104,21 +129,25 @@ na rm e
 Notice that this command accepts partial shortcuts. It will remove the entire subtree of given shortcuts. The first two examples above can be reduced to a single `na rm my` to delete both.
 
 ## Shell Completions
+Some installation methods already setup completions. To activate them manually, add the following to your shell's configuration.
 ### Bash
+Add this to your `~/.bashrc`:
 ```sh
 source <(na completion bash)
 ```
 ### Zsh
+Add this to your `~/.zshrc`:
 ```sh
 source <(na completion zsh)
 ```
-In case of `command not found: compdef`, add this to `~/.zshrc`:
+In case of `command not found: compdef`, add these too:
 ```sh
 autoload -Uz compinit
 compinit
 ```
 
 ### Fish
+Add this to `~/.config/fish/config.fish`
 ```sh
 na completion fish | source
 ```
@@ -127,25 +156,50 @@ na completion fish | source
 Exist but untested.
 
 ## Configuration
-### Locations
 _na_ looks for configuration files in few locations:
 - Local directory (`.na.yaml`)
 - Current user home config directory (`~/.config/na/na.yaml`)
 - XDG config directory (`/etc/xdg/na/na.yaml`)
 
-### Loading
-The default behavior is to merge these configs for `list` and `run`, and to use current user's home config directory for `add` and `remove`. 
+By default, `na` will merge these configs for `list` and `run`, and use current user's home config directory for `add` and `remove`. 
 
 This behavior will be overridden by passing either:
 - `--config FILE` or `-c FILE`: set the only configuration file to use.
 - `--local` or `-l`: synonymous to `-c .na.yaml`.
 
-### Structure
-*Note: Breaking changes ahead (trivial to migrate).*
-
 _na_ configuration is a simple dictionary, mapping shortcut names to either commands or other subcommands.
 
-#### Example
+### Showcase
+```sh
+$ cat .na.yaml
+cat: .na.yaml: No such file or directory
+$ cat ~/.config/na/na.yaml
+cat: /home/moyiz/.config/na/na.yaml: No such file or directory
+$ na add my global -- echo Global
+$ cat ~/.config/na/na.yaml
+my:
+    global: echo Global
+$ na add -l my local -- echo Local
+$ cat .na.yaml 
+my:
+    local: echo Local
+$ na
+my global -- echo Global
+my local -- echo Local
+$ na run my local
+Local
+$ na run my global
+Global
+$ na rm -l my
+$ cat .na.yaml
+{}
+$ cat ~/.config/na/na.yaml
+my:
+    global: echo Global
+
+```
+
+### Example
 ```yaml
 lab:
   secret:
