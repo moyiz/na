@@ -6,32 +6,42 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/moyiz/na/internal/config"
 	"github.com/moyiz/na/internal/utils"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
+var runCmd = &cobra.Command{
+	Use:               "run [name ...] [--] [args ...]",
+	Short:             "Runs a nested alias",
+	Long:              "Runs a nested alias.",
+	Aliases:           []string{"r"},
+	ValidArgsFunction: validRunArgs,
+	Run:               runRun,
+}
+
 func validRunArgs(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	currentKey := strings.Join(args, ".")
-	commands := make([]string, 0)
-	containsDoubleDash := slices.Contains(os.Args, "--")
-	for _, k := range viper.AllKeys() {
-		if strings.HasPrefix(k, currentKey) {
-			trail, _ := strings.CutPrefix(k, currentKey)
-			if suggestion := strings.Split(strings.TrimLeft(trail, "."), ".")[0]; suggestion != "" && !containsDoubleDash {
-				commands = append(commands, suggestion)
-			}
+	if slices.Contains(os.Args, "--") {
+		// Potential location to auto complete commands
+		return []string{}, cobra.ShellCompDirectiveDefault
+	}
+
+	c := config.GetFromFiles(AllConfigFiles()...)
+	currentPrefix := strings.Join(args, " ")
+	suggestions := make([]string, 0)
+	for _, a := range c.ListAliases(args...) {
+		trail, _ := strings.CutPrefix(a.Name, currentPrefix)
+		if trailFields := strings.Fields(trail); len(trailFields) > 0 {
+			suggestions = append(suggestions, trailFields[0])
+		} else {
+			break
 		}
 	}
-	if currentKey != "" && len(commands) == 0 && containsDoubleDash {
-		// ToDo: Add completions of the actual command here.
-		return commands, cobra.ShellCompDirectiveDefault
-	}
-	return commands, cobra.ShellCompDirectiveNoFileComp
+	return suggestions, cobra.ShellCompDirectiveNoFileComp
 }
 
 func runRun(cmd *cobra.Command, args []string) {
-	var alias string
+	var aliasParts []string
 	var extraArgs []string
 
 	if extraArgsStart := cmd.ArgsLenAtDash(); extraArgsStart == 0 {
@@ -39,14 +49,15 @@ func runRun(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	} else if extraArgsStart > 0 {
 		extraArgs = args[extraArgsStart:]
-		alias = strings.Join(args[:extraArgsStart], ".")
+		aliasParts = args[:extraArgsStart]
 	} else {
-		alias = strings.Join(args, ".")
+		aliasParts = args
 	}
 
-	if command := viper.GetString(alias); command == "" {
-		fmt.Println("na:", strings.ReplaceAll(alias, ".", " ")+": not found")
+	c := config.GetFromFiles(AllConfigFiles()...)
+	if alias, err := c.GetAlias(aliasParts...); err != nil {
+		fmt.Println("na:", strings.Join(aliasParts, " ")+":", err)
 	} else {
-		utils.RunInCurrentShell(command, extraArgs)
+		utils.RunInCurrentShell(alias.Command, extraArgs)
 	}
 }
