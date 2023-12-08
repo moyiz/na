@@ -25,6 +25,7 @@ jobs:
           version: latest
           args: release --clean
         env:
+          AUR_KEY: ${{ secrets.AUR_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   push:
     runs-on: ubuntu-latest

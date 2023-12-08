@@ -40,6 +40,43 @@ archives:
       - README.md
       - LICENSE
 
+aurs:
+  - name: na-bin
+    homepage: https://github.com/moyiz/na
+    description: CLI tool to effortlessly manage context aware nested shortcuts for shell commands.
+    license: BSD-3-Clause
+    maintainers:
+      - moyiz <8603313+moyiz@users.noreply.github.com>
+    contributors:
+      - moyiz <8603313+moyiz@users.noreply.github.com>
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: ssh://aur@aur.archlinux.org/na-bin.git
+    depends:
+      - glibc
+    provides:
+      - na
+    package: |-
+      cd ${srcdir}
+      install -Dm755 na ${pkgdir}/usr/bin/na
+      install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/$pkgname/LICENSE
+
+      declare bash_comp=${pkgdir}/usr/share/bash-completion/completions/
+      declare zsh_comp=${pkgdir}/usr/share/zsh/site-functions/
+      declare fish_comp=${pkgdir}/usr/share/fish/vendor_completions.d
+
+      mkdir -p completions ${bash_comp} ${zsh_comp} ${fish_comp}
+
+      ./na completion bash > ./completions/na.bash
+      ./na completion zsh > ./completions/na.zsh
+      ./na completion fish > ./compleions/na.fish
+
+      install -Dm644 ./completions/na.bash ${bash_comp}/na
+      install -Dm644 ./completions/na.zsh ${zsh_comp}/_na
+      install -Dm644 ./completions/na.fish ${fish_comp}/na.fish
+    commit_author:
+      name: moyiz
+      email: 8603313+moyiz@users.noreply.github.com
+
 changelog:
   sort: asc
   filters:
