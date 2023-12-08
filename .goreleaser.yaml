@@ -68,7 +68,7 @@ aurs:
 
       ./na completion bash > ./completions/na.bash
       ./na completion zsh > ./completions/na.zsh
-      ./na completion fish > ./compleions/na.fish
+      ./na completion fish > ./completions/na.fish
 
       install -Dm644 ./completions/na.bash ${bash_comp}/na
       install -Dm644 ./completions/na.zsh ${zsh_comp}/_na
