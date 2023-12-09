@@ -30,7 +30,7 @@ func getConfigFromArgs() (string, error) {
 
 // Returns the active configuration file path according to flags.
 // Defaults to $XDG_CONFIG_HOME/na/na.yaml
-func CurrentConfigFile() string {
+func ActiveConfigFile() string {
 	if configFile, err := getConfigFromArgs(); err == nil {
 		return configFile
 	} else {

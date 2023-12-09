@@ -16,7 +16,7 @@ var removeCmd = &cobra.Command{
 	Args:              cobra.MinimumNArgs(1),
 	ValidArgsFunction: validRemoveArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		c := config.GetFromFiles(CurrentConfigFile())
+		c := config.GetFromFiles(ActiveConfigFile())
 		if err := c.UnsetAlias(args...); err != nil {
 			fmt.Println("na:", strings.Join(args, " ")+":", err)
 			os.Exit(1)
@@ -25,7 +25,7 @@ var removeCmd = &cobra.Command{
 }
 
 func validRemoveArgs(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	c := config.GetFromFiles(CurrentConfigFile())
+	c := config.GetFromFiles(ActiveConfigFile())
 	currentPrefix := strings.Join(args, " ")
 	suggestions := make([]string, 0)
 	for _, a := range c.ListAliases(args...) {

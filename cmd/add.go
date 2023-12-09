@@ -19,7 +19,7 @@ It will create the config directory if not exists`,
 	Aliases: []string{"a"},
 	Args:    cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		configFile := CurrentConfigFile()
+		configFile := ActiveConfigFile()
 
 		// Create directories if not exist
 		configDir := path.Dir(configFile)
