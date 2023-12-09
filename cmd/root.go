@@ -13,7 +13,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "na",
-	Short: "A simple tool to create nested alias-like commands with dynamic completions",
+	Short: "CLI tool to effortlessly manage context aware nested shortcuts for shell commands.",
 	Long:  consts.Logo,
 	Run:   listRun,
 }

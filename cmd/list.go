@@ -7,13 +7,19 @@ import (
 	"strings"
 
 	"github.com/moyiz/na/internal/config"
+	"github.com/moyiz/na/internal/consts"
 	"github.com/spf13/cobra"
 )
 
 var listCmd = &cobra.Command{
-	Use:               "list [name ...]",
-	Short:             "Shows a list of aliases",
-	Long:              "Show a list of aliases under an optional given prefix.",
+	Use:                   "list [name ...]",
+	DisableFlagsInUseLine: true,
+	Short:                 "Lists aliases and target commands",
+	Long: consts.Logo + `
+Lists all aliases under optional given partial prefix.
+The output format is a list of full alias names and their target commands,
+separated by double-dash (--).
+By default, all configuration files are merged for this command.`,
 	Aliases:           []string{"l", "ls"},
 	ValidArgsFunction: validListArgs,
 	Run:               listRun,

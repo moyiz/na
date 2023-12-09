@@ -6,16 +6,19 @@ import (
 	"path"
 
 	"github.com/moyiz/na/internal/config"
+	"github.com/moyiz/na/internal/consts"
 	"github.com/spf13/cobra"
 )
 
 var addCmd = &cobra.Command{
-	Use:   "add [name ...] [--] [command ...]",
-	Short: "Adds a nested alias to configuration",
-	Long: `Adds a nested alias to configuration.
-If the command consists more than a single word, an optional '--' will act as
-a delimiter between the alias and the command.
-It will create the config directory if not exists`,
+	Use:                   "add [name ...] [--] [command ...]",
+	DisableFlagsInUseLine: true,
+	Short:                 "Adds a nested alias to a configuration",
+	Long: consts.Logo + `
+Adds a nested alias to configuration.
+If the target command consists more than a single word, an optional '--' will
+act as a delimiter between the alias and the command.
+It will create the config directory if at does not exist.`,
 	Aliases: []string{"a"},
 	Args:    cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
