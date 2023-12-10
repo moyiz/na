@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/moyiz/na/internal/config"
@@ -31,16 +32,9 @@ By default, the global (home directory config) configuration is used.`,
 }
 
 func validRemoveArgs(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	c := config.GetFromFiles(ActiveConfigFile())
-	currentPrefix := strings.Join(args, " ")
-	suggestions := make([]string, 0)
-	for _, a := range c.ListAliases(args...) {
-		trail, _ := strings.CutPrefix(a.Name, currentPrefix)
-		if trailFields := strings.Fields(trail); len(trailFields) > 0 {
-			suggestions = append(suggestions, trailFields[0])
-		} else {
-			break
-		}
+	if slices.Contains(os.Args, "--") {
+		return []string{}, cobra.ShellCompDirectiveDefault
 	}
-	return suggestions, cobra.ShellCompDirectiveNoFileComp
+	config.GetFromFiles(ActiveConfigFile())
+	return config.ListNextParts(args), cobra.ShellCompDirectiveNoFileComp
 }

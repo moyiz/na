@@ -94,3 +94,27 @@ func (c *Config) GetAlias(part ...string) (Alias, error) {
 		return Alias{Name: strings.ReplaceAll(key, ".", " "), Command: command}, nil
 	}
 }
+
+// Given a list of alias name parts, return a list of valid next parts.
+// Example:
+//
+//	  my:
+//		  aliases:
+//		    one: cmd1
+//		    two: cmd2
+//
+// ListNextParts([]string{"my"}) -> []string{"aliases"}
+// ListNextParts([]string{"my", "aliases"}) -> []string{"cmd1", "cmd2"}
+func ListNextParts(parts []string) []string {
+	currentPrefix := strings.Join(parts, " ")
+	suggestions := make([]string, 0)
+	for _, a := range ListAliases(parts...) {
+		trail, _ := strings.CutPrefix(a.Name, currentPrefix)
+		if trailFields := strings.Fields(trail); len(trailFields) > 0 {
+			suggestions = append(suggestions, trailFields[0])
+		} else {
+			break
+		}
+	}
+	return suggestions
+}
