@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"slices"
-	"strings"
 
 	"github.com/moyiz/na/internal/config"
 	"github.com/moyiz/na/internal/consts"
@@ -27,22 +26,10 @@ By default, all configuration files are merged for this command.`,
 
 func validListArgs(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	if slices.Contains(os.Args, "--") {
-		// Potential location to auto complete commands
 		return []string{}, cobra.ShellCompDirectiveDefault
 	}
-
-	c := config.GetFromFiles(AllConfigFiles()...)
-	currentPrefix := strings.Join(args, " ")
-	suggestions := make([]string, 0)
-	for _, a := range c.ListAliases(args...) {
-		trail, _ := strings.CutPrefix(a.Name, currentPrefix)
-		if trailFields := strings.Fields(trail); len(trailFields) > 0 {
-			suggestions = append(suggestions, trailFields[0])
-		} else {
-			break
-		}
-	}
-	return suggestions, cobra.ShellCompDirectiveNoFileComp
+	config.GetFromFiles(AllConfigFiles()...)
+	return config.ListNextParts(args), cobra.ShellCompDirectiveNoFileComp
 }
 
 func listRun(cmd *cobra.Command, args []string) {
