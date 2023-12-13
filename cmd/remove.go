@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/moyiz/na/internal/cli"
 	"github.com/moyiz/na/internal/config"
 	"github.com/moyiz/na/internal/consts"
 	"github.com/spf13/cobra"
@@ -23,8 +24,8 @@ By default, the global (home directory config) configuration is used.`,
 	Args:              cobra.MinimumNArgs(1),
 	ValidArgsFunction: validRemoveArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		c := config.GetFromFiles(ActiveConfigFile())
-		if err := c.UnsetAlias(args...); err != nil {
+		config.LoadFiles(ActiveConfigFile())
+		if err := config.UnsetAlias(args...); err != nil {
 			fmt.Println("na:", strings.Join(args, " ")+":", err)
 			os.Exit(1)
 		}
@@ -35,6 +36,6 @@ func validRemoveArgs(cmd *cobra.Command, args []string, toComplete string) ([]st
 	if slices.Contains(os.Args, "--") {
 		return []string{}, cobra.ShellCompDirectiveDefault
 	}
-	config.GetFromFiles(ActiveConfigFile())
-	return config.ListNextParts(args), cobra.ShellCompDirectiveNoFileComp
+	config.LoadFiles(ActiveConfigFile())
+	return cli.ListNextParts(config.ListAliases(), args), cobra.ShellCompDirectiveNoFileComp
 }

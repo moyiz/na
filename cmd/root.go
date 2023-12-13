@@ -53,7 +53,7 @@ func AllConfigFiles() []string {
 
 func init() {
 	cobra.EnableCommandSorting = true
-	cobra.OnInitialize(func() { config.GetFromFiles(AllConfigFiles()...) })
+	cobra.OnInitialize(func() { config.LoadFiles(AllConfigFiles()...) })
 	rootCmd.PersistentFlags().StringP("config", "c", "", "Path of the config file to use")
 	rootCmd.PersistentFlags().BoolP("local", "l", false, "Use local config (.na.yaml)")
 	rootCmd.MarkFlagsMutuallyExclusive("local", "config")

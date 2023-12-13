@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/moyiz/na/internal/cli"
 	"github.com/moyiz/na/internal/config"
 	"github.com/moyiz/na/internal/consts"
 	"github.com/moyiz/na/internal/utils"
@@ -34,8 +35,8 @@ func validRunArgs(cmd *cobra.Command, args []string, toComplete string) ([]strin
 		// Potential location to auto complete commands
 		return []string{}, cobra.ShellCompDirectiveDefault
 	}
-	config.GetFromFiles(AllConfigFiles()...)
-	return config.ListNextParts(args), cobra.ShellCompDirectiveNoFileComp
+	config.LoadFiles(AllConfigFiles()...)
+	return cli.ListNextParts(config.ListAliases(), args), cobra.ShellCompDirectiveNoFileComp
 }
 
 func runRun(cmd *cobra.Command, args []string) {
@@ -52,8 +53,8 @@ func runRun(cmd *cobra.Command, args []string) {
 		aliasParts = args
 	}
 
-	c := config.GetFromFiles(AllConfigFiles()...)
-	if alias, err := c.GetAlias(aliasParts...); err != nil {
+	config.LoadFiles(AllConfigFiles()...)
+	if alias, err := config.GetAlias(aliasParts...); err != nil {
 		fmt.Println("na:", strings.Join(aliasParts, " ")+":", err)
 	} else {
 		utils.RunInCurrentShell(alias.Command, extraArgs)

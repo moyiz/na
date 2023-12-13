@@ -5,6 +5,7 @@ import (
 	"os"
 	"slices"
 
+	"github.com/moyiz/na/internal/cli"
 	"github.com/moyiz/na/internal/config"
 	"github.com/moyiz/na/internal/consts"
 	"github.com/spf13/cobra"
@@ -28,8 +29,8 @@ func validListArgs(cmd *cobra.Command, args []string, toComplete string) ([]stri
 	if slices.Contains(os.Args, "--") {
 		return []string{}, cobra.ShellCompDirectiveDefault
 	}
-	config.GetFromFiles(AllConfigFiles()...)
-	return config.ListNextParts(args), cobra.ShellCompDirectiveNoFileComp
+	config.LoadFiles(AllConfigFiles()...)
+	return cli.ListNextParts(config.ListAliases(), args), cobra.ShellCompDirectiveNoFileComp
 }
 
 func listRun(cmd *cobra.Command, args []string) {

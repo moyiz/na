@@ -27,7 +27,7 @@ It will create the config directory if at does not exist.`,
 		// Create directories if not exist
 		configDir := path.Dir(configFile)
 		if _, err := os.Stat(configDir); err != nil {
-			os.MkdirAll(configDir, 0775)
+			os.MkdirAll(configDir, 0o775)
 		}
 
 		// Separate alias key and command at `--` or set the command to the last argument
@@ -40,8 +40,8 @@ It will create the config directory if at does not exist.`,
 			sep = len(args) - 1
 		}
 
-		c := config.GetFromFiles(configFile)
-		if err := c.SetAlias(args[:sep], args[sep:]); err != nil {
+		config.LoadFiles(configFile)
+		if err := config.SetAlias(args[:sep], args[sep:]); err != nil {
 			fmt.Println("na: add:", err)
 			os.Exit(1)
 		}
