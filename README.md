@@ -11,6 +11,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/moyiz/na.svg)](https://pkg.go.dev/github.com/moyiz/na)
 ![GitHub License](https://img.shields.io/github/license/moyiz/na)
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/moyiz/na)
+![GitHub all releases](https://img.shields.io/github/downloads/moyiz/na/total)
 
 
 **na** (aka: _nested-aliases_, _non-aliases_, _not-[an]-alias_) is a CLI tool to effortlessly manage context aware nested shortcuts for shell commands.
