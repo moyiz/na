@@ -11,11 +11,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var Version string
+
 var rootCmd = &cobra.Command{
-	Use:   "na",
-	Short: "CLI tool to effortlessly manage context aware nested shortcuts for shell commands.",
-	Long:  consts.Logo,
-	Run:   listRun,
+	Use:     "na",
+	Short:   "CLI tool to effortlessly manage context aware nested shortcuts for shell commands.",
+	Long:    consts.Logo,
+	Run:     listRun,
+	Version: Version,
 }
 
 func getConfigFromArgs() (string, error) {
