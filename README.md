@@ -31,6 +31,7 @@
     - [Listing shortcuts](#listing-shortcuts)
     - [Running shortcuts](#running-shortcuts)
     - [Removing shortcuts](#removing-shortcuts)
+    - [Argument Placeholders](#argument-placeholders)
 - [Shell Completions](#shell-completions)
     - [Bash](#bash)
     - [Zsh](#zsh)
@@ -44,7 +45,7 @@
 - [License](#license)
 
 ## Motivation
-Shell aliases are fun. They provide an easy and straightforward way to create simple shortcuts without much fuss, but not without few caveats:
+Shell aliases are fun. They provide an easy and straightforward way to create simple shortcuts without too much fuss, but not without few caveats:
 - *Aliases must be named with a single word* - It makes grouping related aliases within the same context a bit awkward, e.g:
     ```sh
     alias lab-password-sftpgo="k get secret -n sftpgo sftpgo-admin -ojsonpath='{.data.admin-password}' | base64 -d"
@@ -53,12 +54,13 @@ Shell aliases are fun. They provide an easy and straightforward way to create si
     ```
     Using dashes (or underscores) to separate conceptual subcommands interferes with the flow of shell completion and renaming the common prefixes of the aliases names is inconvenient as well. This limitation also prevent aliases from imitating commands.
 - Without implementing workarounds, *Aliases (or any shell configuration) are global for the current user*, and thus there is *no context aware toggling of aliases* - Some of the aliases might be relevant only for a single purpose or project.
-- *Aliases do not support passing non suffixed arguments* - Aliases are substituted. That is why there is no support for passing arguments that are not suffixed to the alias itself. A possible workaround is to use shell functions or other tools (See [Future Plans](#future-plans)).
+- *Aliases do not support passing non suffixed arguments* - Aliases are substituted. That is why there is no support for passing arguments that are not suffixed to the alias itself. A possible workaround is to use shell functions or other tools.
 
 Last but not least, this project is a great excuse for me to work with _Go_, as it is a great language for developing CLI tools. Single binaries for CLI tools are awesome.
 
 ## Features
 - **N**esting **a**liases (ehm, shortcuts).
+- Supports passing arguments and argument substitutions.
 - Dynamic shell completions.
 - Simple and readable configuration.
 - Layered configuration (local and home config).
@@ -95,6 +97,7 @@ Use the `add` subcommand (or its shorter form: `a`) to add new shortcuts:
 na add my shortcut cwd pwd
 na a my longcut cwd -- echo A shortcut to show current working directory, which is '$PWD'
 na a e echo
+na a swap -- echo %2% %1%
 ```
 In the first example (without double dashes), the last argument is the target of the shortcut, i.e `na run my shortcut cwd` will execute `pwd`. This is handy for single word commands.
 
@@ -115,6 +118,7 @@ Use the `run` subcommand (or its shorted form: `r`).
 ```sh
 na run my shortcut cwd
 na r e -- Hello World!
+na r swap -- a b  # output: b a
 ```
 The first example is self explanatory. Notice the double dash in the second example. In `run` it is mandatory in order to pass arguments to the shortcut itself.
 
@@ -128,6 +132,39 @@ na remove my longcut
 na rm e
 ```
 Notice that this command accepts partial shortcuts. It will remove the entire subtree of given shortcuts. The first two examples above can be reduced to a single `na rm my` to delete both.
+
+### Argument Placeholders
+`na` supports magic placeholders in commands. Magic placeholders are wrapped with `%` and allow passing dynamic arguments directly into the target command.
+
+We will start with an example:
+```sh
+$ na add swap -- echo %2% %1%
+$ na run swap -- a b
+b a
+$ na run swap -- a b c d
+b a c d
+$ na add double -- echo %2% %2%
+$ na run double -- a b
+b b a
+$ na run double -- a b c d
+b b a c d
+```
+
+These placeholders are "popped" from the given argument list into the target command. All arguments that are not referenced by a magic placeholder will be passed to the end of the command as regular arguments.
+
+This behavior allows more flexibility in command generation, such as:
+```sh
+na add secret -- kubectl get secret -n %1% %2% -ojsonpath='{.data.%3%}' \| base64 -d
+na r secret -- gitea gitea-admin-secret password
+na r secret -- gitea gitea-admin-secret username
+```
+
+_Tip_: Argument placeholders can also be negative to reference arguments backwards.
+```sh
+$ na add last is first -- echo %-1%
+$ na run last is first -- a b c d e
+e a b c d
+```
 
 ## Shell Completions
 Some installation methods already setup completions. To activate them manually, add the following to your shell's configuration.
@@ -225,9 +262,7 @@ random: echo $RANDOM
   `pushd`, `read`, `set`, `shopt`, `source` and so on.
 
 ## Future Plans
-- Magic placeholders in commands.
-- Read aliases from environment variables.
-- Support `.env`
+- Read aliases from environment variables (and `.env`).
 - Rename aliases.
 - Dynamically creates actual commands, e.g.
   ```sh

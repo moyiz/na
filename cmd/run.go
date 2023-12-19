@@ -57,6 +57,7 @@ func runRun(cmd *cobra.Command, args []string) {
 	if alias, err := config.GetAlias(aliasParts...); err != nil {
 		fmt.Println("na:", strings.Join(aliasParts, " ")+":", err)
 	} else {
-		utils.RunInCurrentShell(alias.Command, extraArgs)
+		command := utils.GenerateCommand(alias.Command, extraArgs)
+		utils.RunInCurrentShell(command.Command, command.Args)
 	}
 }
