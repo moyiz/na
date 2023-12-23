@@ -67,15 +67,20 @@ aurs:
       declare zsh_comp=${pkgdir}/usr/share/zsh/site-functions/
       declare fish_comp=${pkgdir}/usr/share/fish/vendor_completions.d
 
-      mkdir -p completions ${bash_comp} ${zsh_comp} ${fish_comp}
+      mkdir -p ${bash_comp} ${zsh_comp} ${fish_comp}
 
-      ./na completion bash > ./completions/na.bash
-      ./na completion zsh > ./completions/na.zsh
-      ./na completion fish > ./completions/na.fish
+      ./na completion bash > na.bash
+      ./na completion zsh > na.zsh
+      ./na completion fish > na.fish
 
-      install -Dm644 ./completions/na.bash ${bash_comp}/na
-      install -Dm644 ./completions/na.zsh ${zsh_comp}/_na
-      install -Dm644 ./completions/na.fish ${fish_comp}/na.fish
+      install -Dm644 ./na.bash ${bash_comp}/na
+      install -Dm644 ./na.zsh ${zsh_comp}/_na
+      install -Dm644 ./na.fish ${fish_comp}/na.fish
+
+      ./na docs -o ./man
+      mkdir -p ${pkgdir}/usr/share/man/man1/
+      install -Dm644 ./man/* ${pkgdir}/usr/share/man/man1/
+      install -d ${pkgdir}/usr/share
     commit_author:
       name: moyiz
       email: 8603313+moyiz@users.noreply.github.com
