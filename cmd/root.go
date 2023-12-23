@@ -14,11 +14,12 @@ import (
 var Version string
 
 var rootCmd = &cobra.Command{
-	Use:     "na",
-	Short:   "CLI tool to effortlessly manage context aware nested shortcuts for shell commands.",
-	Long:    consts.Logo,
-	Run:     listRun,
-	Version: Version,
+	Use:               "na",
+	Short:             "CLI tool to effortlessly manage context aware nested shortcuts for shell commands.",
+	Long:              consts.Logo,
+	Run:               listRun,
+	Version:           Version,
+	DisableAutoGenTag: true,
 }
 
 func getConfigFromArgs() (string, error) {
@@ -60,7 +61,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("config", "c", "", "Path of the config file to use")
 	rootCmd.PersistentFlags().BoolP("local", "l", false, "Use local config (.na.yaml)")
 	rootCmd.MarkFlagsMutuallyExclusive("local", "config")
-	rootCmd.AddCommand(runCmd, addCmd, removeCmd, listCmd)
+	rootCmd.AddCommand(runCmd, addCmd, removeCmd, listCmd, docsCmd)
 }
 
 // Quiet feature (TBA):

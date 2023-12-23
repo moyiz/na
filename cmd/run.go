@@ -8,7 +8,6 @@ import (
 
 	"github.com/moyiz/na/internal/cli"
 	"github.com/moyiz/na/internal/config"
-	"github.com/moyiz/na/internal/consts"
 	"github.com/moyiz/na/internal/utils"
 	"github.com/spf13/cobra"
 )
@@ -17,13 +16,14 @@ var runCmd = &cobra.Command{
 	Use:                   "run [name ...] [--] [args ...]",
 	DisableFlagsInUseLine: true,
 	Short:                 "Runs a nested alias",
-	Long: consts.Logo + `
-Runs a nested alias.
-Any arguments after an optional double-dash (--) will be passed as arguments
-to the target command.
-It tries to determine the shell from which it was executed and runs the command
-in a sub-shell. If the current shell cannot be determined, it will fallback to
-'sh'.
+	Long: `Runs a nested alias.
+All arguments after an optional double-dash (--) will be passed as arguments
+to the target command.  
+The target command will be executed in a new sub-shell. It will try to
+determine the shell from which it was executed. If the current shell cannot be
+determined, it will fallback to 'sh'.
+
+The short form of 'run' is 'r'.  
 By default, all configuration files are merged for this command.`,
 	Aliases:           []string{"r"},
 	ValidArgsFunction: validRunArgs,
