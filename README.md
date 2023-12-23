@@ -1,11 +1,11 @@
 ```text
-    _______   ______  
-   |       \ |      \ 
-   | ▓▓▓▓▓▓▓\ \▓▓▓▓▓▓\
-   | ▓▓  | ▓▓/      ▓▓
-   | ▓▓  | ▓▓  ▓▓▓▓▓▓▓
-   | ▓▓  | ▓▓\▓▓    ▓▓
-    \▓▓   \▓▓ \▓▓▓▓▓▓▓
+     _______   ______  
+    |       \ |      \ 
+    | ▓▓▓▓▓▓▓\ \▓▓▓▓▓▓\
+    | ▓▓  | ▓▓/      ▓▓
+    | ▓▓  | ▓▓  ▓▓▓▓▓▓▓
+    | ▓▓  | ▓▓\▓▓    ▓▓
+     \▓▓   \▓▓ \▓▓▓▓▓▓▓
 ```
 ![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/moyiz/na)
 [![Go Reference](https://pkg.go.dev/badge/github.com/moyiz/na.svg)](https://pkg.go.dev/github.com/moyiz/na)
