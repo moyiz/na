@@ -258,6 +258,57 @@ func TestUnsetAlias(t *testing.T) {
 	}
 }
 
+type UnsetAliasByPrefixTestCase struct {
+	Config         ConfigFile
+	Key            []string
+	ExpectedConfig string
+	ExpectedError  error
+}
+
+func TestUnsetAliasByPrefix(t *testing.T) {
+	for _, testCase := range []UnsetAliasTestCase{
+		{
+			Config: ConfigFile{
+				Path:    "/tmp/config.yaml",
+				Content: "my:\n    alias: cmd\n    alias2: cmd2\n",
+			},
+			Key:            []string{"my", "alias"},
+			ExpectedConfig: "{}\n",
+		},
+		{
+			Config: ConfigFile{
+				Path:    "/tmp/config.yaml",
+				Content: "my:\n    alias: cmd\n    alias2: cmd2\n",
+			},
+			Key:            []string{"my"},
+			ExpectedConfig: "{}\n",
+		},
+		{
+			Config: ConfigFile{
+				Path:    "/tmp/config.yaml",
+				Content: "my:\n    alias: cmd\n    alias2: cmd2\n",
+			},
+			Key:            []string{"another"},
+			ExpectedConfig: "my:\n    alias: cmd\n    alias2: cmd2\n",
+			ExpectedError:  ErrAliasNotFound,
+		},
+	} {
+		c := Config{v: viper.New()}
+		fs := afero.NewMemMapFs()
+		resetConfig(fs, c, testCase.Config)
+		if err := c.UnsetAliasByPrefix(testCase.Key...); !errors.Is(err, testCase.ExpectedError) {
+			t.Errorf("Expected %#v but got %#v", testCase.ExpectedError, err)
+		}
+		if contents, err := afero.ReadFile(fs, testCase.Config.Path); err != nil {
+			panic(err)
+		} else {
+			if result := string(contents); result != testCase.ExpectedConfig {
+				t.Errorf("Config contents differ. Expected:\n%#v\nBut got:\n%#v", testCase.ExpectedConfig, result)
+			}
+		}
+	}
+}
+
 type GetAliasTestCase struct {
 	Config        ConfigFile
 	Key           []string

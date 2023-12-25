@@ -12,37 +12,41 @@ import (
 )
 
 var removeCmd = &cobra.Command{
-	Use:                   "remove [prefix ...]",
+	Use:                   "remove [-p|--prefix] <path ...>",
 	DisableFlagsInUseLine: true,
 	Short:                 "Removes nested aliases from a configuration",
-	Long: `Removes a nested alias from a configuration.
-It accepts partial aliases paths to remove multiple aliases at once.
-By default, the global (home directory config) configuration is used.
+	Long: `Removes nested aliases from a configuration.  
+It supports two modes for selecting aliases to remove:  
+- Exact matching [default] - will select all aliases associated with the  
+  given path.  
+- Prefix matching (-p|--prefix) - will select any alias that is prefixed by  
+  the given path.  
 
 The short form of 'remove' is 'rm'.  
 By default, the global configuration file is used for this command.  
 
-Example na.yaml:  
-my:
+Given the following configuration:  
+my:  
     alias1: ...  
     alias2: ...  
     another:  
         alias: ...  
-	   
-To delete 'my alias1':  
-$ na rm my alias1  
-To delete 'my alias1' and 'my alias2':  
-$ na rm my al  
-To delete 'my another alias':  
-$ na rm my another  
-To delete all:  
-$ na rm my`,
+  
+$ na rm my alias1 # Will remove 'my alias1'  
+$ na rm my al # Will not match with any alias  
+$ na rm -p my al # Will match 'my alias1' and 'my alias2'`,
 	Aliases:           []string{"rm"},
 	Args:              cobra.MinimumNArgs(1),
 	ValidArgsFunction: validRemoveArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		config.LoadFiles(ActiveConfigFile())
-		if err := config.UnsetAlias(args...); err != nil {
+		var unsetFunc func(...string) error
+		if byPrefix, _ := cmd.Flags().GetBool("prefix"); byPrefix {
+			unsetFunc = config.UnsetAliasByPrefix
+		} else {
+			unsetFunc = config.UnsetAlias
+		}
+		if err := unsetFunc(args...); err != nil {
 			fmt.Println("na:", strings.Join(args, " ")+":", err)
 			os.Exit(1)
 		}
@@ -55,4 +59,8 @@ func validRemoveArgs(cmd *cobra.Command, args []string, toComplete string) ([]st
 	}
 	config.LoadFiles(ActiveConfigFile())
 	return cli.ListNextParts(config.ListAliases(), args), cobra.ShellCompDirectiveNoFileComp
+}
+
+func init() {
+	removeCmd.Flags().BoolP("prefix", "p", false, "Remove aliases by prefix instead of exact match")
 }

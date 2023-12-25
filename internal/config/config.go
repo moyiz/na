@@ -78,6 +78,36 @@ func (c *Config) UnsetAlias(key ...string) error {
 	return c.v.WriteConfig()
 }
 
+func UnsetAliasByPrefix(prefix ...string) error {
+	return c.UnsetAliasByPrefix(prefix...)
+}
+
+func (c *Config) UnsetAliasByPrefix(prefix ...string) error {
+	var found bool
+	keyPrefix := strings.Join(prefix, ".")
+	for _, key := range c.v.AllKeys() {
+		if strings.HasPrefix(key, keyPrefix) {
+			keyParts := strings.Split(key, ".")
+			parts := len(keyParts)
+			keyPath := strings.Join(keyParts[:parts-1], ".")
+			delete(c.v.Get(keyPath).(map[string]interface{}), keyParts[parts-1])
+			found = true
+		}
+	}
+	if !found {
+		return ErrAliasNotFound
+	}
+	return c.v.WriteConfig()
+}
+
+func Write() error {
+	return c.Write()
+}
+
+func (c *Config) Write() error {
+	return c.v.WriteConfig()
+}
+
 func ListAliases(prefix ...string) []Alias {
 	return c.ListAliases(prefix...)
 }
