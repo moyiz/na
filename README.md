@@ -204,6 +204,7 @@ By default, `na` will merge these configs for `list` and `run`, and use current 
 This behavior will be overridden by passing either:
 - `--config FILE` or `-c FILE`: set the only configuration file to use.
 - `--local` or `-l`: synonymous to `-c .na.yaml`.
+- `--user` or `-u`: synonymous to `-c ${XDG_CONFIG_HOME}/na/na.yaml`.
 
 _na_ configuration is a simple dictionary, mapping shortcut names to either commands or other subcommands.
 

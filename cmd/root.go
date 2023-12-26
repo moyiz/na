@@ -13,6 +13,16 @@ import (
 
 var Version string
 
+var configPath = struct {
+	Local  string
+	User   string
+	Global string
+}{
+	Local:  ".na.yaml",
+	User:   path.Join(xdg.ConfigHome, "na", "na.yaml"),
+	Global: path.Join(xdg.ConfigDirs[0], "na", "na.yaml"),
+}
+
 var rootCmd = &cobra.Command{
 	Use:               "na",
 	Short:             "CLI tool to effortlessly manage context aware nested shortcuts for shell commands.",
@@ -24,7 +34,9 @@ var rootCmd = &cobra.Command{
 
 func getConfigFromArgs() (string, error) {
 	if local, _ := rootCmd.Flags().GetBool("local"); local {
-		return ".na.yaml", nil
+		return configPath.Local, nil
+	} else if user, _ := rootCmd.Flags().GetBool("user"); user {
+		return configPath.User, nil
 	} else if config, _ := rootCmd.Flags().GetString("config"); config != "" {
 		return config, nil
 	} else {
@@ -38,7 +50,7 @@ func ActiveConfigFile() string {
 	if configFile, err := getConfigFromArgs(); err == nil {
 		return configFile
 	} else {
-		return path.Join(xdg.ConfigHome, "na", "na.yaml")
+		return configPath.User
 	}
 }
 
@@ -48,9 +60,9 @@ func AllConfigFiles() []string {
 		return []string{configFile}
 	} else {
 		return []string{
-			path.Join(xdg.ConfigDirs[0], "na", "na.yaml"),
-			path.Join(xdg.ConfigHome, "na", "na.yaml"),
-			".na.yaml",
+			configPath.Global,
+			configPath.User,
+			configPath.Local,
 		}
 	}
 }
@@ -60,6 +72,7 @@ func init() {
 	cobra.OnInitialize(func() { config.LoadFiles(AllConfigFiles()...) })
 	rootCmd.PersistentFlags().StringP("config", "c", "", "Path of the config file to use")
 	rootCmd.PersistentFlags().BoolP("local", "l", false, "Use local config (.na.yaml)")
+	rootCmd.PersistentFlags().BoolP("user", "u", false, "Use user config (${XDG_CONF_HOME}/na/na.yaml)")
 	rootCmd.MarkFlagsMutuallyExclusive("local", "config")
 	rootCmd.AddCommand(runCmd, addCmd, removeCmd, listCmd, docsCmd)
 }
