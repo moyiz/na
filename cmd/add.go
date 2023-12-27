@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"slices"
 
+	"github.com/moyiz/na/internal/cli"
 	"github.com/moyiz/na/internal/config"
 	"github.com/spf13/cobra"
 )
@@ -42,6 +44,13 @@ $ na run my alias -- a b c d
 d a b c`,
 	Aliases: []string{"a"},
 	Args:    cobra.MinimumNArgs(2),
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if slices.Contains(os.Args, "--") {
+			return []string{}, cobra.ShellCompDirectiveDefault
+		}
+		config.LoadFiles(ActiveConfigFile())
+		return cli.ListNextParts(config.ListAliases(), args), cobra.ShellCompDirectiveNoFileComp
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		configFile := ActiveConfigFile()
 
