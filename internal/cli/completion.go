@@ -10,10 +10,10 @@ import (
 // Given a list of alias name parts, return a list of valid next parts.
 // Example:
 //
-//	  my:
-//		  aliases:
-//		    one: cmd1
-//		    two: cmd2
+//	my:
+//	  aliases:
+//	    one: cmd1
+//	    two: cmd2
 //
 // ListNextParts([]string{"my"}) -> []string{"aliases"}
 // ListNextParts([]string{"my", "aliases"}) -> []string{"cmd1", "cmd2"}

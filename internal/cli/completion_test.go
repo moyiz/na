@@ -26,6 +26,10 @@ func TestListNextParts(t *testing.T) {
 			Command: "cmd1",
 		},
 		{
+			Name:    "my other command2",
+			Command: "cmd2",
+		},
+		{
 			Name:    "another command2",
 			Command: "cmd1",
 		},
@@ -44,7 +48,7 @@ func TestListNextParts(t *testing.T) {
 		{
 			Aliases:  aliases,
 			Prefix:   []string{"my", "other"},
-			Expected: []string{"command"},
+			Expected: []string{"command", "command2"},
 		},
 		{
 			Aliases:  aliases,

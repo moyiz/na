@@ -163,6 +163,70 @@ func TestListAliases(t *testing.T) {
 				Path:    "/tmp/config.yaml",
 				Content: "my:\n    alias: command\n    alias2: command2",
 			},
+			Prefix: []string{"my", "alias"},
+			Expected: []Alias{
+				{
+					Name:    "my alias",
+					Command: "command",
+				},
+			},
+		},
+		{
+			Config: ConfigFile{
+				Path:    "/tmp/config.yaml",
+				Content: "my:\n    alias: command\n    alias2: command2",
+			},
+			Prefix:   []string{"my", "al"},
+			Expected: []Alias{},
+		},
+		{
+			Config: ConfigFile{
+				Path:    "/tmp/config.yaml",
+				Content: "my:\n    alias: command\n    alias2: command2",
+			},
+			Prefix: []string{"my"},
+			Expected: []Alias{
+				{
+					Name:    "my alias",
+					Command: "command",
+				},
+				{
+					Name:    "my alias2",
+					Command: "command2",
+				},
+			},
+		},
+	} {
+		c := Config{v: viper.New()}
+		fs := afero.NewMemMapFs()
+		resetConfig(fs, c, testCase.Config)
+		if aliases := c.ListAliases(testCase.Prefix...); !slices.Equal(aliases, testCase.Expected) {
+			t.Errorf("Expected %#v but got %#v", testCase.Expected, aliases)
+		}
+	}
+
+}
+
+func TestListAliasesByPrefix(t *testing.T) {
+	for _, testCase := range []ListAliasesTestCase{
+		{
+			Config: ConfigFile{
+				Path:    "/tmp/config.yaml",
+				Content: "my:\n    alias: command\nanother: command3",
+			},
+			Prefix: []string{"my"},
+			Expected: []Alias{
+				{
+					Name:    "my alias",
+					Command: "command",
+				},
+			},
+		},
+		{
+			Config: ConfigFile{
+				Path:    "/tmp/config.yaml",
+				Content: "my:\n    alias: command\n    alias2: command2",
+			},
 			Prefix: []string{"my", "alias2"},
 			Expected: []Alias{
 				{
@@ -188,11 +252,28 @@ func TestListAliases(t *testing.T) {
 				},
 			},
 		},
+		{
+			Config: ConfigFile{
+				Path:    "/tmp/config.yaml",
+				Content: "my:\n    alias: command\n    alias2: command2",
+			},
+			Prefix: []string{"my", "al"},
+			Expected: []Alias{
+				{
+					Name:    "my alias",
+					Command: "command",
+				},
+				{
+					Name:    "my alias2",
+					Command: "command2",
+				},
+			},
+		},
 	} {
 		c := Config{v: viper.New()}
 		fs := afero.NewMemMapFs()
 		resetConfig(fs, c, testCase.Config)
-		if aliases := c.ListAliases(testCase.Prefix...); !slices.Equal(aliases, testCase.Expected) {
+		if aliases := c.ListAliasesByPrefix(testCase.Prefix...); !slices.Equal(aliases, testCase.Expected) {
 			t.Errorf("Expected %#v but got %#v", testCase.Expected, aliases)
 		}
 	}

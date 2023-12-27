@@ -108,11 +108,33 @@ func (c *Config) Write() error {
 	return c.v.WriteConfig()
 }
 
-func ListAliases(prefix ...string) []Alias {
-	return c.ListAliases(prefix...)
+func ListAliases(key ...string) []Alias {
+	return c.ListAliases(key...)
 }
 
-func (c *Config) ListAliases(prefix ...string) []Alias {
+func (c *Config) ListAliases(key ...string) []Alias {
+	keys := c.v.AllKeys()
+	sort.Strings(keys)
+
+	aliases := make([]Alias, 0)
+	aliasPrefix := strings.Join(key, ".")
+	for _, k := range keys {
+		if strings.HasPrefix(k, aliasPrefix+".") || k == aliasPrefix {
+			aliases = append(aliases, Alias{
+				Name:    strings.ReplaceAll(k, ".", " "),
+				Command: c.v.GetString(k),
+			})
+		}
+	}
+
+	return aliases
+}
+
+func ListAliasesByPrefix(prefix ...string) []Alias {
+	return c.ListAliasesByPrefix(prefix...)
+}
+
+func (c *Config) ListAliasesByPrefix(prefix ...string) []Alias {
 	keys := c.v.AllKeys()
 	sort.Strings(keys)
 

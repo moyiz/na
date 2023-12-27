@@ -34,7 +34,17 @@ func validListArgs(cmd *cobra.Command, args []string, toComplete string) ([]stri
 }
 
 func listRun(cmd *cobra.Command, args []string) {
-	for _, alias := range config.ListAliases(args...) {
+	var aliases []config.Alias
+	if byPrefix, _ := cmd.Flags().GetBool("prefix"); byPrefix {
+		aliases = config.ListAliasesByPrefix(args...)
+	} else {
+		aliases = config.ListAliasesByPrefix(args...)
+	}
+	for _, alias := range aliases {
 		fmt.Println(alias.Name, "--", alias.Command)
 	}
+}
+
+func init() {
+	listCmd.Flags().BoolP("prefix", "p", false, "List aliases by prefix instead of exact match")
 }
