@@ -269,6 +269,23 @@ func TestListAliasesByPrefix(t *testing.T) {
 				},
 			},
 		},
+		{
+			Config: ConfigFile{
+				Path:    "/tmp/config.yaml",
+				Content: "my:\n    alias: command\n    alias2: command2",
+			},
+			Prefix: []string{},
+			Expected: []Alias{
+				{
+					Name:    "my alias",
+					Command: "command",
+				},
+				{
+					Name:    "my alias2",
+					Command: "command2",
+				},
+			},
+		},
 	} {
 		c := Config{v: viper.New()}
 		fs := afero.NewMemMapFs()

@@ -119,7 +119,7 @@ func (c *Config) ListAliases(key ...string) []Alias {
 	aliases := make([]Alias, 0)
 	aliasPrefix := strings.Join(key, ".")
 	for _, k := range keys {
-		if strings.HasPrefix(k, aliasPrefix+".") || k == aliasPrefix {
+		if aliasPrefix == "" || strings.HasPrefix(k, aliasPrefix+".") || k == aliasPrefix {
 			aliases = append(aliases, Alias{
 				Name:    strings.ReplaceAll(k, ".", " "),
 				Command: c.v.GetString(k),
