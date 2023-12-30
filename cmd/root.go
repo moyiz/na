@@ -72,7 +72,7 @@ func init() {
 	cobra.OnInitialize(func() { config.LoadFiles(AllConfigFiles()...) })
 	rootCmd.PersistentFlags().StringP("config", "c", "", "Path of the config file to use")
 	rootCmd.PersistentFlags().BoolP("local", "l", false, "Use local config (.na.yaml)")
-	rootCmd.PersistentFlags().BoolP("user", "u", false, "Use user config (${XDG_CONF_HOME}/na/na.yaml)")
+	rootCmd.PersistentFlags().BoolP("user", "u", false, "Use user config ($XDG_CONFIG_HOME/na/na.yaml)")
 	rootCmd.MarkFlagsMutuallyExclusive("local", "config")
 	rootCmd.AddCommand(runCmd, addCmd, removeCmd, listCmd, docsCmd)
 }
