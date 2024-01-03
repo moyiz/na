@@ -10,8 +10,10 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
+    flags: -trimpath
     ldflags:
       - -X github.com/moyiz/na/cmd.Version={{.Version}}
+      - -s
     goos:
       - linux
       - darwin
