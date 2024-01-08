@@ -87,6 +87,21 @@ aurs:
       name: moyiz
       email: 8603313+moyiz@users.noreply.github.com
 
+brews:
+  - name: na
+    homepage: https://github.com/moyiz/na
+    description: CLI tool to effortlessly manage context aware nested shortcuts for shell commands.
+    license: BSD-3-Clause
+    skip_upload: false
+    repository:
+      owner: moyiz
+      name: homebrew-tap
+      branch: master
+      git:
+        private_key: "{{ .Env.TAP_DEPLOY_KEY }}"
+    post_install: |-
+      generate_completions_from_executable(bin/"na", "completion", shells: [:bash, :zsh, :fish])
+
 changelog:
   sort: asc
   filters:
