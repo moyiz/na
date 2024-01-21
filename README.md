@@ -23,8 +23,9 @@
 - [Features](#features)
 - [Installation](#installation)
     - [Binaries](#binaries)
-    - [Source](#source)
     - [AUR](#aur)
+    - [Homebrew](#homebrew)
+    - [Source](#source)
     - [Build](#build)
 - [Usage](#usage)
     - [Adding shortcuts](#adding-shortcuts)
@@ -70,15 +71,21 @@ Last but not least, this project is a great excuse for me to work with _Go_, as 
 ### Binaries
 Available in [Releases](https://github.com/moyiz/na/releases) page.
 
-### Source
-```sh
-go install github.com/moyiz/na@latest
-```
-
 ### AUR
 Use your favorite AUR helper:
 ```sh
 yay -S na-bin
+```
+
+### Homebrew
+Install from a tap:
+```sh
+brew install moyiz/tap/na
+```
+
+### Source
+```sh
+go install github.com/moyiz/na@latest
 ```
 
 ### Build
